@@ -1,0 +1,242 @@
+# pylog485 
+--------------------------------------------------------------------
+
+# about this project #
+### what is it ###
+This is a python software which installs on a raspberry pi. the software logs the data from RS485 sensors which are connected to the raspberry pi (through an RS485 to USB converter).
+
+The software is a simple django server, installed on the raspberry pi, which can be controlled and configured remotely through a simple webpage that it serves, if an internet connection is present. If no internet connection is present then the logged data will be saved in an sqlite database on the raspberry pi. The data is sent to databases when an internet connection is found.
+
+### why ##
+The process of reading data from RS485 sensors and sending them to a database is simple. However, there are currently no cheap solutions in the market to do this, one is forced to purchase an expensive data logger.
+
+### advantages & disadvantages ###
+
+Compared to a typical datalogger, the advantages are:
+
+* Cheap: about $100 worth of devices is needed for the data logger (excluding the sensors and power supply of course).
+* Accurate: working with digital RS485 sensors means that the analogue to digital conversion takes places in the sensor and hence there is no loss of accuracy if sensors are at a distance from raspberry-pi.
+* Can connect to many sensors: currently it can connect to 32 RS485 sensors, but with some modifications, this could be increased to 255 sensors.
+* Has user-friendly interface: you can connect to the device over the internet from anywhere, view the data, change the settings, update the software, (a simple website is hosted on the device which allows you to control the device).
+* Lots of storage capacity: with 8GB memory card, i's no problem to record high resolution data for years in case there is no internet connection.
+* Data is sent to a mongodb and to wherever you want: mongodb is a modern database for unstructured data, you can export to csv and other formats.
+
+The disadvantages are:
+
+* You are forced to work with RS485 sensors, 
+you have less choices of sensors
+* they consumer more power.
+* they are slightly more expensive, for example:
+    * the imt solar RS485 sensor (Si-RS485-TC-T, 319,00 €) costs 50 euros more than its analogue equivalent (Si-420TC-T, 269,00 €)     ,
+    * the kipp&zonen RS485 pyranometer (SMP 11, 1.995,00€) costs 100 euros more that its analogue equivalent (CMP11 1.895,00€)
+    * However, it is possible to connect to analogue devices by using analogue to digital converters (I havent yet worked on this)
+* Needs more power: about 1.5W for raspberry-pi, and 0.5W/sensor, which is much more than an expensive data logger, so you cannot rely on batteries only, you need a power supply or a small PV system
+* Not industrial quality: if you cannot tolerate any hours of missing data, then this might be a problem, I haven't yet heavily tested it, however, I have had the device connected and running for few days now without any problems
+
+
+# Setting it up #
+* prepare the SD card as described in the section below
+* make sure the RS458 sensors do not have conflicting addresses
+* connect wires
+    * connect all the sensors together to the RS485 network, and to the RS485-to-USB converter
+    * connect converter to the raspberry pi through USB
+    * power up the devices
+* make sure that
+    * the raspberry pi has access to the internet
+* port forward
+    * in the settings of the router, setup port forwarding to forward port 9001 to device 192.168.1.201, at port 9001
+* using another computer that is connected to the same network, open the page that is served by the raspberry pi `http://192.168.1.201:9001` and edit the configuration json string in `http://192.168.1.201:9001/admin/pylog485app/conf/2/` to your needs:
+    * the `record` process: the software connects to the RS485-to-USB converter through the `port` address. Every `sample_period` seconds it queries the data using the information in the `sensors_conf` and converts them to the correct scale using `m` and `c`. Every `data_period` seconds it performs the mathematical operation**s** in `pp` on the queried data and saves the results in a local sqlite db in bson format (eg:`{"Tcell-avg": 25.7, "G-avg": 0.0, "Tamb-avg": 23.0, "timestamp": {"$date": 1426423560000}, "G-std": 0.0, "Tmod-avg": 22.03, "Tamb-max": 23.0}`).
+    * the `send` process: every `send_period` seconds the software attempts to  connect to the database address `mongo_address` and to send the data from the local sqlite db. The program deletes data after `keep_period` seconds from the time the data was sent to the online databse
+determines how often the data from the sensors are queried
+    * the `monitor` process: this using the GPIO pins to measure voltage and other data to monitor the health of the power system powering the raspberry pi. It is still not completely ready to be used
+```
+{
+    "record": {
+        "port": "/dev/ttyUSB0",
+        "sample_period": 5,
+        "data_period": 60,
+        "sensors_conf": {
+            "Tamb": {
+                "active": true,
+                "address": 10,
+                "register": 2,
+                "pp": ["avg", "max"],
+                "m": 0.1,
+                "c": -25.0
+            },
+            "Tmod": {
+                "active": true,
+                "address": 11,
+                "register": 1,
+                "pp": ["avg"],
+                "m": 0.1,
+                "c": -25.0
+            },
+            "G": {
+                "active": true,
+                "address": 12,
+                "register": 0,
+                "pp": ["avg", "std"],
+                "m": 1.0,
+                "c": 0.0
+            },
+            "Tcell": {
+                "active": true,
+                "address": 12,
+                "register": 1,
+                "pp": ["avg"],
+                "m": 0.1,
+                "c": -25.0
+            }
+        }
+    },
+    "send": {
+        "keep_period": 300,
+        "send_period": 240,
+        "mongo_address": "mongodb://pylog485:pylog485@ds053390.mongolab.com:53390/public"
+    },
+    "monitor": {
+        "gpio_conf": {
+            "BatVolt": {
+                "active": true,
+                "gpio_pin": 4,
+                "Vth": 1.551,
+                "RC": 3.272,
+                "Rratio": 0.01
+            }
+        },
+        "data_period": 60
+    }
+}
+```
+
+
+
+# RPI SD card preparation #
+
+* copy raspbian image to an 8 GB SD card
+    * format the sd card while setting FORMAT SIZE ADJUSTMENT ON using the program https://www.sdcard.org/downloads/formatter_4/eula_windows/
+    * download rasberian image from http://www.raspberrypi.org/downloads/
+    * put the image on the SD card using http://sourceforge.net/projects/win32diskimager/
+
+* download dependencies and website on SD card
+    * put the SD card in the raspberry pi
+    * connect it to the internet
+    * make sure SSH is enabled (it should be by default) and select finish on the configuration
+    * in the configuration, expand the rpi sd card, if you missed the ocnfiguration you can find it in `sudo raspi-config`, run the first option
+    * username and password: pi, raspberry
+    * execute (takes about 25min)`sudo apt-get install git && sudo git clone -b develop https://omargammoh@bitbucket.org/omargammoh/website && sudo apt-get install python-dev <<<y && sudo apt-get install python-pip <<<y && sudo apt-get install tmux && sudo pip install django==1.7 && sudo pip install pymodbus==1.2.0 && sudo pip install pymongo==2.8`
+    * sometimes this is needed to allow DB writing, needs more checking `chmod 75 /home/pi/pylog485`
+
+* setup autostart    
+    * setup auto login (http://elinux.org/RPi_Debian_Auto_Login)
+        * in the file `sudo nano /etc/inittab`
+        * comment change the line `1:2345:respawn:/sbin/getty 115200 tty1`
+        * add under it the line `1:2345:respawn:/bin/login -f pi tty1 </dev/tty1 >/dev/tty1 2>&1` 
+    * run server automatically at log-in
+        * adding at the end of the file `sudo nano /home/pi/.bashrc`
+        * the line `. /home/pi/pylog485/start.sh`
+
+* configure a static-ip wifi (https://kerneldriver.wordpress.com/2012/10/21/configuring-wpa2-using-wpa_supplicant-on-the-raspberry-pi/)
+    * note: definitions of things in this link (https://www.modmypi.com/blog/tutorial-how-to-give-your-raspberry-pi-a-static-ip-address)
+    * some documentation (http://www.debian.org/doc/manuals/debian-reference/ch05.en.html#_the_basic_syntax_of_etc_network_interfaces)
+    * edit `sudo nano /etc/wpa_supplicant/wpa_supplicant.conf`
+    * to become:
+
+
+```
+#!python
+
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="!!Your SSID here"
+    proto=RSN
+    key_mgmt=WPA-PSK
+    pairwise=CCMP TKIP
+    group=CCMP TKIP
+    psk="!!Your password here"
+}    
+
+```
+
+  * * edit `sudo nano /etc/network/interfaces`
+  * * to become:
+
+
+```
+#!python
+
+auto lo
+iface lo inet loopback
+iface eth0 inet dhcp
+
+#### for a wlan DHCP ip
+#iface wlan0 inet dhcp
+#   wpa-ssid "Ground floor"#
+#   wpa-psk "error404"#the name of the wifi network***
+
+#### for a wlan static ip
+allow-hotplug wlan0
+auto wlan0
+iface wlan0 inet manual
+wpa-roam /etc/wpa_supplicant/wpa_supplicant.conf
+iface default inet static
+    #the address you want to give your pi, current address can be found with ifconfig, inet addr:192.168.1.4
+    address 192.168.1.201
+    #from ifconfig, Mask:255.255.255.0
+    netmask 255.255.255.0
+    #the router IP address, from netstat -nr, Destination 192.168.1.0#
+    network 192.168.1.0
+    #from netstat -nr, Gateway 192.168.1.1
+    gateway 192.168.1.1
+
+```
+
+# Restarting the tmux session
+* kill tmux session with `tmux kill-session -t 0` (replace "0" by session id)
+* run the server in a tmux session `. /home/pi/pylog485/start.sh`
+
+# Some usefull tmux tips and commands
+* a guide on how to use tmux: http://www.hackzine.org/auto-starting-tmux-with-panes-services.html
+* sharing sessions: http://readystate4.com/2011/01/02/sharing-remote-terminal-session-between-two-users-with-tmux/
+* session are stored in /tmp
+* `tmux a -t 0` to enter the session with  id "0"
+* `tmux list-sessions`
+* `ctrl-b` then `d` leave the session
+
+# Some useful linux commands
+* `sudo ifdown wlan0` to switch off wifi
+* `sudo ifup wlan0` to switch on wifi
+* `ntptime` 
+   
+# To access a server on your local network
+* if the server is on a windows machine:
+    * get the server ip address on the local network, this can be found with ipconfig command, and look for the IPv4 info, (eg 192.168.1.4)
+    * python manage.py runserver 192.168.1.4:8000
+    * from another device, you can access the website from 192.168.1.4:8000
+
+# To find the address of the rpi rs485 usb converter
+* `ls -al /dev/ttyUSB* `
+
+# How to test this
+* [checked]disconnect one of the sensor while in operation 
+    * -> processes continue and data of the sensor should not be logged at all (no NaNs)
+    * -> things go back to normal when reconnected
+        
+* [checked]discconect all sensors
+    * -> no data sent to server
+    * -> things go back to normal when reconnected
+                          
+* [checked]disconnect modbus usb
+    * -> waits for connection
+    * -> things go back to normal when reconnected
+    
+* disconnect wifi network, disconnect wifi adapter
+    * -> [checked]keeps logging
+    * -> [not good!]things go back to normal when reconnected        
+
+* [checked]turn power off and back on   
+* [not good!]start without internet

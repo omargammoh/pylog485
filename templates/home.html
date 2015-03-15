@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <div>
+        <h2>STATUS</h2>
+        <button type="button" id="btn_status_overview">Overview</button>
+        <button type="button" id="btn_status_conf">Config</button>
+        <button type="button" id="btn_status_recentdata">Recent data</button>
+        <p id="p_status_status">...</p>
+    </div>
+    <hr>
+    <div>
+        <h2>RECORD <i>process</i></h2>
+        <button type="button" id="btn_record_start">Start record</button>
+        <button type="button" id="btn_record_stop">Stop record</button>
+        <button type="button" id="btn_record_status">Status record</button>
+        <p id="p_record_status">...</p>
+    </div>
+    <hr>
+    <div>
+        <h2>SEND <i>process</i></h2>
+        <button type="button" id="btn_send_start">Start send</button>
+        <button type="button" id="btn_send_stop">Stop send</button>
+        <button type="button" id="btn_send_status">Status send</button>
+        <p id="p_send_status">...</p>
+    </div>
+    <hr>
+    <div>
+        <h2>MONITOR <i>process</i></h2>
+        <button type="button" id="btn_monitor_start">Start monitor</button>
+        <button type="button" id="btn_monitor_stop">Stop monitor</button>
+        <button type="button" id="btn_monitor_status">Status monitor</button>
+        <p id="p_monitor_status">...</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>some sidebar things</h2>
+    </div>
+</div>
+
+<script>
+
+function syntaxHighlight(json) {
+    if (typeof json != 'string') {
+         json = JSON.stringify(json, undefined, 2);
+    }
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+        var cls = 'number';
+        if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+                cls = 'key';
+            } else {
+                cls = 'string';
+            }
+        } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+        } else if (/null/.test(match)) {
+            cls = 'null';
+        }
+        return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
+
+function make_cmd_function(url, data, p_update){
+    function func(){
+
+        var btn =  $(this)
+        btn.prop('disabled', true);
+
+        $.ajax({
+            url: url,
+            data: data,
+            success: function (data, textStatus, jqXHR) {
+                if ('error' in data) {
+                    alert("server error for " + url + data['error'])
+                }
+                d = data
+                var s = JSON.stringify(data, undefined, 4).replace(/(?: )/g, '&nbsp;').replace(/(?:\r\n|\r|\n)/g, '<br />');
+                p_update.html("<pre><code>" + s + "</code></pre>")
+                btn.prop('disabled', false);
+
+                if (data['ison'] == true) {
+                    p_update.parent().find('h2').css('color', 'lightgreen');
+                }
+                else if (data['ison'] == false) {
+                    p_update.parent().find('h2').css('color', 'red');
+                }
+                else {
+                    p_update.parent().find('h2').css('color', 'black')
+                }
+
+            },
+            error: function (err) {
+                e = err
+                alert("ajax error for " + url + " error = " + err)
+                btn.prop('disabled', false);
+            }
+
+        });
+    }
+    return func
+
+}
+
+
+
+$("#btn_status_overview").click(make_cmd_function("{% url "pylog485app.views.data.status" %}", {"cmd":"overview"}, $('#p_status_status')))
+$("#btn_status_conf").click(make_cmd_function("{% url "pylog485app.views.data.status" %}", {"cmd":"conf"}, $('#p_status_status')))
+$("#btn_status_recentdata").click(make_cmd_function("{% url "pylog485app.views.data.status" %}", {"cmd":"recentdata"}, $('#p_status_status')))
+
+$("#btn_record_start").click(make_cmd_function("{% url "pylog485app.views.data.record" %}", {"cmd":"start"}, $('#p_record_status')))
+$("#btn_record_stop").click(make_cmd_function("{% url "pylog485app.views.data.record" %}", {"cmd":"stop"}, $('#p_record_status')))
+$("#btn_record_status").click(make_cmd_function("{% url "pylog485app.views.data.record" %}", {"cmd":"status"}, $('#p_record_status')))
+
+$("#btn_send_start").click(make_cmd_function("{% url "pylog485app.views.data.send" %}", {"cmd":"start"}, $('#p_send_status')))
+$("#btn_send_stop").click(make_cmd_function("{% url "pylog485app.views.data.send" %}", {"cmd":"stop"}, $('#p_send_status')))
+$("#btn_send_status").click(make_cmd_function("{% url "pylog485app.views.data.send" %}", {"cmd":"status"}, $('#p_send_status')))
+
+$("#btn_monitor_start").click(make_cmd_function("{% url "pylog485app.views.data.monitor" %}", {"cmd":"start"}, $('#p_monitor_status')))
+$("#btn_monitor_stop").click(make_cmd_function("{% url "pylog485app.views.data.monitor" %}", {"cmd":"stop"}, $('#p_monitor_status')))
+$("#btn_monitor_status").click(make_cmd_function("{% url "pylog485app.views.data.monitor" %}", {"cmd":"status"}, $('#p_monitor_status')))
+
+
+</script>
+<style>
+.key{
+    color:blue
+}
+.string{
+    color:green;
+}
+</style>
+{% endblock %}
+
+
+
