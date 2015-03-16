@@ -1,20 +1,19 @@
 # pylog485 
---------------------------------------------------------------------
 
 # about this project #
+
 ### what is it ###
 This is a python software which installs on a raspberry pi. the software logs the data from RS485 sensors which are connected to the raspberry pi (through an RS485 to USB converter).
 
 The software is a simple django server, installed on the raspberry pi, which can be controlled and configured remotely through a simple webpage that it serves, if an internet connection is present. If no internet connection is present then the logged data will be saved in an sqlite database on the raspberry pi. The data is sent to databases when an internet connection is found.
 
 ### why ##
-The process of reading data from RS485 sensors and sending them to a database is simple. However, there are currently no cheap solutions in the market to do this, one is forced to purchase an expensive data logger.
+The process of reading data from RS485 sensors and sending it to a database is not complex and should not require complex hardware. However, there are currently no cheap solutions in the market to do this, one is forced to purchase an expensive data logger.
 
 ### advantages & disadvantages ###
-
 Compared to a typical datalogger, the advantages are:
 
-* Cheap: about $100 worth of devices is needed for the data logger (excluding the sensors and power supply of course).
+* Cheap: about $100 worth of devices is needed for the data logger (excluding the sensors).
 * Accurate: working with digital RS485 sensors means that the analogue to digital conversion takes places in the sensor and hence there is no loss of accuracy if sensors are at a distance from raspberry-pi.
 * Can connect to many sensors: currently it can connect to 32 RS485 sensors, but with some modifications, this could be increased to 255 sensors.
 * Has user-friendly interface: you can connect to the device over the internet from anywhere, view the data, change the settings, update the software, (a simple website is hosted on the device which allows you to control the device).
@@ -25,16 +24,17 @@ The disadvantages are:
 
 * You are forced to work with RS485 sensors, 
 you have less choices of sensors
-* they consumer more power.
-* they are slightly more expensive, for example:
+* They consumer more power.
+* They are slightly more expensive, for example:
     * the imt solar RS485 sensor (Si-RS485-TC-T, 319,00 €) costs 50 euros more than its analogue equivalent (Si-420TC-T, 269,00 €)     ,
-    * the kipp&zonen RS485 pyranometer (SMP 11, 1.995,00€) costs 100 euros more that its analogue equivalent (CMP11 1.895,00€)
+    * the kipp&zonen RS485 pyranometer (SMP 11, 1.995,00€) costs 100 euros more that its analogue equivalent (CMP11 1.895,00 €)
     * However, it is possible to connect to analogue devices by using analogue to digital converters (I havent yet worked on this)
 * Needs more power: about 1.5W for raspberry-pi, and 0.5W/sensor, which is much more than an expensive data logger, so you cannot rely on batteries only, you need a power supply or a small PV system
-* Not industrial quality: if you cannot tolerate any hours of missing data, then this might be a problem, I haven't yet heavily tested it, however, I have had the device connected and running for few days now without any problems
+* Not industrial quality: if you cannot tolerate any hours of missing data, then this might be a problem, I haven't yet heavily tested it, however, I have had the device connected and running for few weeks now without any problems.
 
 
 # Setting it up #
+note: the steps below summarize the steps i took to set it up, there are other ways to do these steps. If you have better ways of implementing certain steps please share them with us! 
 * prepare the SD card as described in the section below
 * make sure the RS458 sensors do not have conflicting addresses
 * connect wires
@@ -53,7 +53,17 @@ determines how often the data from the sensors are queried
 ```
 {
     "record": {
-        "port": "/dev/ttyUSB0",
+        "rs485_conf": {
+            "port": "/dev/ttyUSB0",
+            "method"": "rtu", 
+            "baudrate": 9600, 
+            "stopbits": 1,
+            "bytesize": 8, 
+            "parity": "N",
+            "retries": 1000, 
+            "rtscts": true,
+            "timeout": 0.05
+         },
         "sample_period": 5,
         "data_period": 60,
         "sensors_conf": {
@@ -99,7 +109,7 @@ determines how often the data from the sensors are queried
     "monitor": {
         "gpio_conf": {
             "BatVolt": {
-                "active": true,
+                "active": false,
                 "gpio_pin": 4,
                 "Vth": 1.551,
                 "RC": 3.272,
@@ -114,7 +124,6 @@ determines how often the data from the sensors are queried
 
 
 # RPI SD card preparation #
-
 * copy raspbian image to an 8 GB SD card
     * format the sd card while setting FORMAT SIZE ADJUSTMENT ON using the program https://www.sdcard.org/downloads/formatter_4/eula_windows/
     * download rasberian image from http://www.raspberrypi.org/downloads/
