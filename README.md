@@ -137,7 +137,7 @@ note: the steps below summarize the steps I took to set it up, there are other w
 * Setup autologin and autostart    
     * Setup auto login (http://elinux.org/RPi_Debian_Auto_Login)
         * In the file `sudo nano /etc/inittab`
-        * Comment change the line `1:2345:respawn:/sbin/getty 115200 tty1`
+        * Comment the line `1:2345:respawn:/sbin/getty --noclear 38400 tty1`
         * Add under it the line `1:2345:respawn:/bin/login -f pi tty1 </dev/tty1 >/dev/tty1 2>&1` 
     * Run server automatically at log-in
         * Adding at the end of the file `sudo nano /home/pi/.bashrc`
@@ -150,8 +150,6 @@ note: the steps below summarize the steps I took to set it up, there are other w
     * To become (with the correct configuration of `ssid` and `psk`, that's your wifi network name and password):
 
 ```
-#!python
-
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
 
@@ -170,8 +168,6 @@ network={
 
 
 ```
-#!python
-
 auto lo
 iface lo inet loopback
 iface eth0 inet dhcp
