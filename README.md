@@ -102,7 +102,7 @@ note: the steps below summarize the steps I took to set it up, there are other w
     "send": {
         "keep_period": 300,
         "send_period": 240,
-        "mongo_address": "mongodb://pylog485:pylog485@ds053390.mongolab.com:53390/public"
+        "mongo_address": "mongodb://pylog485:pylog485@ds031627.mongolab.com:31627/public"
     },
     "monitor": {
         "gpio_conf": {
