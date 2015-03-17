@@ -254,3 +254,9 @@ iface default inet static
 
 # Donations
 * Bitcoin: `1AkFBf789j1AzV6Hr73fSfBJbihQ7nAKmp`
+
+# Some pics
+![Alt text](https://github.com/omargammoh/pylog485/tree/master/img/pylog485.jpg "setup")
+![Alt text](https://github.com/omargammoh/pylog485/tree/master/img/pylog485.jpg "website")
+
+
