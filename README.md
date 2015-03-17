@@ -45,6 +45,10 @@ note: the steps below summarize the steps I took to set it up, there are other w
     * Power up the devices
 * Make sure that
     * The raspberry pi has access to the internet
+* If you installed a real time clock (a real time clock is a must if you do not have stable internet and power supply, because the rpi syncs its time using the internet):
+    * Connect with ssh (device ip is `192.168.1.201`)
+    * Make sure the system time is correct by executing the command `date` and viewing the time 
+    * Copy the system time to the real time clock with `sudo hwclock -w` 
 * Port forward
     * optional: If you would like have access to this from outside your local network, in the settings of the router, setup port forwarding to forward a port of your choice to the device 192.168.1.201, at port 9001
 * Using another computer that is connected to the same network, open the page that is served by the raspberry pi `http://192.168.1.201:9001` and edit the configuration json string in `http://192.168.1.201:9001/admin/pylog485app/conf/2/` to your needs (login is `pylog485`, password is `pylog485`), see the json string below and the following explanation of it:
@@ -166,8 +170,9 @@ network={
 }    
 
 ```
-* Edit `sudo nano /etc/network/interfaces`
-* To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply change it):
+* 
+    * Edit `sudo nano /etc/network/interfaces`
+    * To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply choose another address):
 
 
 ```
@@ -196,7 +201,24 @@ iface default inet static
     gateway 192.168.1.1
 
 ```
-* Recommended: configure the real time clock (i still need to writet down procedure for this)
+
+* Optional but recommended: configure the real time clock,  this needs the RTC hardware (https://www.modmypi.com/blog/installing-the-rasclock-raspberry-pi-real-time-clock)
+    * Run `wget http://afterthoughtsoftware.com/files/linux-image-3.6.11-atsw-rtc_1.0_armhf.deb&&sudo dpkg -i linux-image-3.6.11-atsw-rtc_1.0_armhf.deb&&sudo cp /boot/vmlinuz-3.6.11-atsw-rtc+ /boot/kernel.img`
+    * Add at the end of the file `sudo nano /etc/modules` the following lines
+
+```
+i2c-bcm2708
+rtc-pcf2127a
+```
+* 
+  * Add the following lines just before the `exit 0` line in `sudo nano /etc/rc.local`
+
+```
+echo pcf2127a 0x51 > /sys/class/i2c-adapter/i2c-1/new_device
+( sleep 2; hwclock -s ) &
+```
+* restart
+   * `sudo reboot`
 
 # Usage
 * The datalogging and sending of data starts automatically when the raspberry pi boots
@@ -208,7 +230,8 @@ iface default inet static
     * run `. /home/pi/pylog485/start.sh` to run the server in a tmux session 
 
 # TODO:
-* Write procedure to include a realtime clock. This is important because currently the raspberry pi relies on the internet to sync its clock, if the rpi is disconnected from power then powered again without the presence of internet, its clock will be wrong, and logged data will have the wrong timestamp.
+* Figure out how to log 4..20 mA sensors and 0..10 mV sensors
+* Figure out how to monitor 0..30 V signals (to monitor the batter supplying the devices)
 
 # Some usefull linux things
 * Restarting the tmux session
@@ -228,6 +251,15 @@ iface default inet static
    
 * To find the address of the rpi rs485 usb converter
     * `ls -al /dev/ttyUSB* `
+
+* real time clock commands:
+    * `hwclock -w to copy the system time into the clock module`
+    * `hwclock -r To read the time from the clock module`
+    * `hwclock -s To copy the time from the clock module to the system`
+
+
+
+
 
 # How to test this
 * [checked]disconnect one of the sensor while in operation 
@@ -256,7 +288,6 @@ iface default inet static
 * Bitcoin: `1AkFBf789j1AzV6Hr73fSfBJbihQ7nAKmp`
 
 # Some pics
-![Alt text](https://github.com/omargammoh/pylog485/tree/master/img/pylog485.jpg "setup")
-![Alt text](https://github.com/omargammoh/pylog485/tree/master/img/pylog485.jpg "website")
-
+![alt tag](https://raw.github.com/omargammoh/pylog485/master/img/pylog485.jpg)
+![alt tag](https://raw.github.com/omargammoh/pylog485/master/img/website.png)
 
