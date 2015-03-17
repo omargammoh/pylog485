@@ -1,5 +1,4 @@
-
-#just experimenting with pymodbus
+#just checking pymodbus works
 from pymodbus.client.sync import ModbusSerialClient as MSC
 from pymodbus.transaction import ModbusRtuFramer
 
@@ -22,3 +21,12 @@ for i in range(20):
 
 
 client.close()
+
+
+#just checking pymongo works
+mongo_address = "mongodb://pylog485:pylog485@ds031627.mongolab.com:31627/public"
+
+import pymongo
+client = pymongo.MongoClient(mongo_address)
+db = client.get_default_database()
+

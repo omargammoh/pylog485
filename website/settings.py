@@ -100,4 +100,4 @@ import os
 TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), '..', 'templates').replace('\\','/'),)
 
 #oga
-METEO_CONF = 'windows-test' #make sure this conf is in the database in the table pylog485app_conf
+METEO_CONF = 'rpi-test' #make sure this conf is in the database in the table pylog485app_conf
