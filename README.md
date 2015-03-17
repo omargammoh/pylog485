@@ -118,6 +118,7 @@ note: the steps below summarize the steps I took to set it up, there are other w
     }
 }
 ```
+* Go to `http://192.168.1.201:9001` and restart all processes (click stop then start) to take into effect the new configuration
 
 # RPI SD card preparation #
 * Copy raspbian image to an 8 GB SD card
@@ -193,6 +194,13 @@ iface default inet static
     gateway 192.168.1.1
 
 ```
+
+# Usage
+* The django server is run in a tmux session, login to the raspberry pi thourgh ssh and:
+    * run `tmux a -t 0` to see what is being printed, 
+    * type `ctrl-b` then `d` to detach tmuw session
+    * run `tmux kill-session -t 0` to kill tmux session, this will stop the whole thing 
+    * run `. /home/pi/pylog485/start.sh` to run the server in a tmux session 
 
 
 # Some usefull linux things
