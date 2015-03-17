@@ -165,9 +165,8 @@ network={
 }    
 
 ```
-
-    *    * Edit `sudo nano /etc/network/interfaces`
-    *    * To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply change it):
+* Edit `sudo nano /etc/network/interfaces`
+* To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply change it):
 
 
 ```
