@@ -45,7 +45,8 @@ note: the steps below summarize the steps I took to set it up, there are other w
     * Power up the devices
 * Make sure that
     * The raspberry pi has access to the internet
-* If you installed a real time clock:
+* If you installed a real time clock (a real time clock is a must if you do not have stable internet and power supply, because the rpi syncs its time using the internet):
+    * Connect with ssh (device ip is `192.168.1.201`)
     * Make sure the system time is correct by executing the command `date` and viewing the time 
     * Copy the system time to the real time clock with `sudo hwclock -w` 
 * Port forward
@@ -171,7 +172,7 @@ network={
 ```
 * 
     * Edit `sudo nano /etc/network/interfaces`
-    * To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply change it):
+    * To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply choose another address):
 
 
 ```
@@ -229,7 +230,8 @@ echo pcf2127a 0x51 > /sys/class/i2c-adapter/i2c-1/new_device
     * run `. /home/pi/pylog485/start.sh` to run the server in a tmux session 
 
 # TODO:
-* Write procedure to include a realtime clock. This is important because currently the raspberry pi relies on the internet to sync its clock, if the rpi is disconnected from power then powered again without the presence of internet, its clock will be wrong, and logged data will have the wrong timestamp.
+* Figure out how to log 4..20 mA sensors and 0..10 mV sensors
+* Figure out how to monitor 0..30 V signals (to monitor the batter supplying the devices)
 
 # Some usefull linux things
 * Restarting the tmux session
