@@ -256,7 +256,6 @@ iface default inet static
 * Bitcoin: `1AkFBf789j1AzV6Hr73fSfBJbihQ7nAKmp`
 
 # Some pics
-![Alt text](https://github.com/omargammoh/pylog485/tree/master/img/pylog485.jpg "setup")
-![Alt text](https://github.com/omargammoh/pylog485/tree/master/img/pylog485.jpg "website")
-
+![alt tag](https://raw.github.com/omargammoh/pylog485/master/img/pylog485.jpg)
+![alt tag](https://raw.github.com/omargammoh/pylog485/master/img/website.png)
 
