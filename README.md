@@ -3,9 +3,9 @@
 # About this project #
 
 ### What is it ###
-This is a python software which installs on a raspberry pi. the software logs the data from RS485 (aka modbus) sensors which are connected to the raspberry pi through an RS485 to USB converter.
+This is a python software which installs on a raspberry pi (or any computer). The software logs the data from RS485 (aka modbus) sensors which are connected to the raspberry pi through an RS485 to USB converter.
 
-The software is a simple django server, installed on the raspberry pi, which can be controlled and configured remotely through a simple webpage that it serves if an internet connection is present. If no internet connection is present then the logged data will be saved in an sqlite database on the raspberry pi. The data is sent to databases when an internet connection is found.
+The software is a simple django server, installed on the raspberry pi, which can be controlled and configured remotely through a simple webpage that it serves if an internet connection is present. If no internet connection is present then the logged data will be saved in an sqlite database on the raspberry pi. The data is sent to online databases when an internet connection is found.
 
 ### Why was it developed ##
 The process of reading data from RS485 sensors and sending it to a database is not complex and should not require complex hardware. However, there are currently no cheap solutions in the market to do this, one is forced to purchase an expensive data logger.
@@ -19,6 +19,7 @@ Compared to a typical datalogger, the advantages are:
 * Has user-friendly interface: you can connect to the device over the internet from anywhere, view the data, change the settings, update the software, (a simple website is hosted on the device which allows you to control the device).
 * Lots of storage capacity: with 8GB memory card, it's no problem to record high resolution data for years in case there is no internet connection.
 * Data is sent to a mongodb and to wherever you want: mongodb is a modern database for unstructured data, you can export to csv and other formats. If you would like to send your data to different databases, you have to write code to do this.
+* Open source & pythonic: easy to read what is going on and to adapt for your particular case, if you know python...
 
 The disadvantages are:
 
@@ -36,6 +37,8 @@ The disadvantages are:
 note: the steps below summarize the steps I took to set it up, there are other ways to do these steps. If you have better ways of implementing certain steps please share them with us! 
 * Prepare the SD card as described in the section below
 * Make sure the RS458 sensors do not have conflicting addresses
+* Plug the wifi adapter to the raspberry pi
+* A must if poor or no internet connection is present: plug the real time clock to the rpi  
 * Connect wires
     * Connect all the sensors together to the RS485 network, and to the RS485-to-USB converter
     * Connect converter to the raspberry pi through USB
@@ -194,14 +197,19 @@ iface default inet static
     gateway 192.168.1.1
 
 ```
+* Recommended: configure the real time clock (i still need to writet down procedure for this)
 
 # Usage
+* The datalogging and sending of data starts automatically when the raspberry pi boots
+* You can log in to the server and control the device by going to `http://192.168.1.201:9001`. If you have port forwarding enabled in your router, you can do this from anywhere with internet access
 * The django server is run in a tmux session, login to the raspberry pi thourgh ssh and:
     * run `tmux a -t 0` to see what is being printed, 
     * type `ctrl-b` then `d` to detach tmuw session
     * run `tmux kill-session -t 0` to kill tmux session, this will stop the whole thing 
     * run `. /home/pi/pylog485/start.sh` to run the server in a tmux session 
 
+# TODO:
+* Write procedure to include a realtime clock. This is important because currently the raspberry pi relies on the internet to sync its clock, if the rpi is disconnected from power then powered again without the presence of internet, its clock will be wrong, and logged data will have the wrong timestamp.
 
 # Some usefull linux things
 * Restarting the tmux session
@@ -219,7 +227,7 @@ iface default inet static
     * `sudo ifup wlan0` to switch on wifi
     * `ntptime` 
    
-### To find the address of the rpi rs485 usb converter
+* To find the address of the rpi rs485 usb converter
 * `ls -al /dev/ttyUSB* `
 
 # How to test this
@@ -241,3 +249,9 @@ iface default inet static
 
 * [checked]turn power off and back on   
 * [not good!]start without internet
+
+# Have questions? Need help?
+* Contact me on omar dot gammoh at gmail dot com
+
+# Donations
+* Bitcoin: `1AkFBf789j1AzV6Hr73fSfBJbihQ7nAKmp`
