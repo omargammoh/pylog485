@@ -7,10 +7,10 @@ This is a python software which installs on a raspberry pi. the software logs th
 
 The software is a simple django server, installed on the raspberry pi, which can be controlled and configured remotely through a simple webpage that it serves if an internet connection is present. If no internet connection is present then the logged data will be saved in an sqlite database on the raspberry pi. The data is sent to databases when an internet connection is found.
 
-### Why was this developed ##
+### Why was it developed ##
 The process of reading data from RS485 sensors and sending it to a database is not complex and should not require complex hardware. However, there are currently no cheap solutions in the market to do this, one is forced to purchase an expensive data logger.
 
-### advantages & disadvantages ###
+### Advantages & disadvantages ###
 Compared to a typical datalogger, the advantages are:
 
 * Cheap: about $100 worth of devices is needed for the data logger (excluding the sensors).
@@ -166,8 +166,8 @@ network={
 
 ```
 
-  * * Edit `sudo nano /etc/network/interfaces`
-  * * To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply change it):
+    *    * Edit `sudo nano /etc/network/interfaces`
+    *    * To become (with the correct configuration of `netmask`, `network` and `gateway`. make sure your router allows for the static ip address `192.168.1.201`, if not then simply change it):
 
 
 ```
@@ -201,20 +201,20 @@ iface default inet static
 
 
 # Some usefull linux things
-### Restarting the tmux session
-* Kill tmux session with `tmux kill-session -t 0` (replace "0" by session id)
-* Run the server in a tmux session `. /home/pi/pylog485/start.sh`
-### others tmux things
-* A guide on how to use tmux: http://www.hackzine.org/auto-starting-tmux-with-panes-services.html
-* Sharing sessions: http://readystate4.com/2011/01/02/sharing-remote-terminal-session-between-two-users-with-tmux/
-* Session are stored in /tmp
-* `tmux a -t 0` to enter the session with  id "0"
-* `tmux list-sessions`
-* `ctrl-b` then `d` leave the session
-### wifi
-* `sudo ifdown wlan0` to switch off wifi
-* `sudo ifup wlan0` to switch on wifi
-* `ntptime` 
+* Restarting the tmux session
+    * Kill tmux session with `tmux kill-session -t 0` (replace "0" by session id)
+    * Run the server in a tmux session `. /home/pi/pylog485/start.sh`
+* Others tmux things
+    * A guide on how to use tmux: http://www.hackzine.org/auto-starting-tmux-with-panes-services.html
+    * Sharing sessions: http://readystate4.com/2011/01/02/sharing-remote-terminal-session-between-two-users-with-tmux/
+    * Session are stored in /tmp
+    * `tmux a -t 0` to enter the session with  id "0"
+    * `tmux list-sessions`
+    * `ctrl-b` then `d` leave the session
+* Wifi
+    * `sudo ifdown wlan0` to switch off wifi
+    * `sudo ifup wlan0` to switch on wifi
+    * `ntptime` 
    
 ### To find the address of the rpi rs485 usb converter
 * `ls -al /dev/ttyUSB* `
