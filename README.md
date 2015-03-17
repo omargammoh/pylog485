@@ -3,7 +3,7 @@
 # About this project #
 
 ### What is it ###
-This is a python software which installs on a raspberry pi (or any computer). The software logs the data from RS485 (aka modbus) sensors which are connected to the raspberry pi through an RS485 to USB converter.
+This is a python software which installs on a raspberry pi (or any computer). The software logs the data from RS485 (aka modbus) sensors which are connected to the raspberry pi through an RS485 to USB converter. The data is saved locally in an sqlite file. The software sends the data to online databases when there is an internet connection.
 
 The software is a simple django server, installed on the raspberry pi, which can be controlled and configured remotely through a simple webpage that it serves if an internet connection is present. If no internet connection is present then the logged data will be saved in an sqlite database on the raspberry pi. The data is sent to online databases when an internet connection is found.
 
@@ -136,7 +136,6 @@ note: the steps below summarize the steps I took to set it up, there are other w
     * In the configuration, expand the rpi sd card, if you missed the configuration you can find it in `sudo raspi-config`, run the first option
     * Username and password: `pi`, `raspberry`
     * Execute (takes about 25min)`sudo apt-get install git && sudo git clone -b master https://omargammoh@github.com/omargammoh/pylog485.git && sudo apt-get install python-dev <<<y && sudo apt-get install python-pip <<<y && sudo apt-get install tmux && sudo pip install django==1.7 && sudo pip install pymodbus==1.2.0 && sudo pip install pymongo==2.8`
-    * Sometimes this is needed to allow DB writing, needs more checking: `chmod 75 /home/pi/pylog485`
 
 * Setup autologin and autostart    
     * Setup auto login (http://elinux.org/RPi_Debian_Auto_Login)
