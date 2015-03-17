@@ -196,7 +196,19 @@ iface default inet static
     gateway 192.168.1.1
 
 ```
-* Recommended: configure the real time clock (i still need to writet down procedure for this)
+* Optional but recommended: configure the real time clock,  this needs the RTC hardware (https://www.modmypi.com/blog/installing-the-rasclock-raspberry-pi-real-time-clock)
+    * Run `wget http://afterthoughtsoftware.com/files/linux-image-3.6.11-atsw-rtc_1.0_armhf.deb&&sudo dpkg -i linux-image-3.6.11-atsw-rtc_1.0_armhf.deb&&sudo cp /boot/vmlinuz-3.6.11-atsw-rtc+ /boot/kernel.img`
+    * Add at the end of the file `sudo nano /etc/modules` the following lines
+```
+i2c-bcm2708
+rtc-pcf2127a
+```
+    * Add the following lines just before the `exit 0` line in `sudo nano /etc/rc.local`
+```
+echo pcf2127a 0x51 > /sys/class/i2c-adapter/i2c-1/new_device
+( sleep 2; hwclock -s ) &
+```
+* restart 
 
 # Usage
 * The datalogging and sending of data starts automatically when the raspberry pi boots
@@ -228,6 +240,15 @@ iface default inet static
    
 * To find the address of the rpi rs485 usb converter
     * `ls -al /dev/ttyUSB* `
+
+* real time clock commands:
+    * `hwclock -w to copy the system time into the clock module`
+    * `hwclock -r To read the time from the clock module`
+    * `hwclock -s To copy the time from the clock module to the system`
+
+
+
+
 
 # How to test this
 * [checked]disconnect one of the sensor while in operation 
