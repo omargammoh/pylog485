@@ -45,6 +45,9 @@ note: the steps below summarize the steps I took to set it up, there are other w
     * Power up the devices
 * Make sure that
     * The raspberry pi has access to the internet
+* If you installed a real time clock:
+    * Make sure the system time is correct by executing the command `date` and viewing the time 
+    * Copy the system time to the real time clock with `sudo hwclock -w` 
 * Port forward
     * optional: If you would like have access to this from outside your local network, in the settings of the router, setup port forwarding to forward a port of your choice to the device 192.168.1.201, at port 9001
 * Using another computer that is connected to the same network, open the page that is served by the raspberry pi `http://192.168.1.201:9001` and edit the configuration json string in `http://192.168.1.201:9001/admin/pylog485app/conf/2/` to your needs (login is `pylog485`, password is `pylog485`), see the json string below and the following explanation of it:
@@ -196,19 +199,24 @@ iface default inet static
     gateway 192.168.1.1
 
 ```
+
 * Optional but recommended: configure the real time clock,  this needs the RTC hardware (https://www.modmypi.com/blog/installing-the-rasclock-raspberry-pi-real-time-clock)
     * Run `wget http://afterthoughtsoftware.com/files/linux-image-3.6.11-atsw-rtc_1.0_armhf.deb&&sudo dpkg -i linux-image-3.6.11-atsw-rtc_1.0_armhf.deb&&sudo cp /boot/vmlinuz-3.6.11-atsw-rtc+ /boot/kernel.img`
     * Add at the end of the file `sudo nano /etc/modules` the following lines
+
 ```
 i2c-bcm2708
 rtc-pcf2127a
 ```
-    * Add the following lines just before the `exit 0` line in `sudo nano /etc/rc.local`
+
+* * Add the following lines just before the `exit 0` line in `sudo nano /etc/rc.local`
+
 ```
 echo pcf2127a 0x51 > /sys/class/i2c-adapter/i2c-1/new_device
 ( sleep 2; hwclock -s ) &
 ```
-* restart 
+* restart
+   * `sudo reboot`
 
 # Usage
 * The datalogging and sending of data starts automatically when the raspberry pi boots
