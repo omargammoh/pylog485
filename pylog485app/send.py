@@ -32,14 +32,20 @@ def send(send_period, keep_period, mongo_address):
         #waiting to have a connection
         t1 = time()
         j = 0
-        while (not connected) :
-            try :
+        while (not connected):
+            try:
                 client = pymongo.MongoClient(mongo_address)
                 db = client.get_default_database()
             except:
                 pass
+                #print '!! connecting to mongodb failed %s' %mongo_address
+                #print traceback.format_exc()
 
-            connected = client.alive()
+            try:
+                connected = client.alive()
+            except:
+                connected = False
+
             if not connected:
                 #keep trying
                 retryin = min(20 * (j + 1), 60*60)
