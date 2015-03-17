@@ -228,7 +228,7 @@ iface default inet static
     * `ntptime` 
    
 * To find the address of the rpi rs485 usb converter
-* `ls -al /dev/ttyUSB* `
+    * `ls -al /dev/ttyUSB* `
 
 # How to test this
 * [checked]disconnect one of the sensor while in operation 
@@ -245,10 +245,10 @@ iface default inet static
     
 * disconnect wifi network, disconnect wifi adapter
     * -> [checked]keeps logging
-    * -> [not good!]things go back to normal when reconnected        
+    * -> [checked]things go back to normal when reconnected        
 
 * [checked]turn power off and back on   
-* [not good!]start without internet
+* [not good, there is a time delay RTC needed!]start without internet
 
 # Have questions? Need help?
 * Contact me on omar dot gammoh at gmail dot com
