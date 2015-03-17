@@ -53,7 +53,7 @@ def send(send_period, keep_period, mongo_address):
         cnt = {'del': 0, 'send': 0}
         if connected:
             print '    processing data...'
-            for ob in pylog485app.models.Readings.objects.all():
+            for ob in pylog485app.models.Reading.objects.all():
                 meta = json_util.loads(ob.meta)
 
                 #handle the unsent data

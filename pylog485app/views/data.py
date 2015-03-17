@@ -5,7 +5,7 @@ import multiprocessing
 import pylog485app.record
 import pylog485app.send
 import pylog485app.monitor
-from pylog485app.models import Readings, Conf
+from pylog485app.models import Reading, Conf
 from datetime import datetime
 from django.conf import settings
 import traceback
@@ -33,9 +33,9 @@ def status(request):
             dic['configuration label'] = settings.METEO_CONF
 
         if cmd == "recentdata":
-            #dic["the last 5 recorded stamps in local DB"] = [{'data':json_util.loads(ob.data), 'meta':json_util.loads(ob.meta)} for ob in Readings.objects.all().order_by('-id')[:5]]
-            dic["the last 20 recorded stamps in local DB"] = [str({'data':json_util.loads(ob.data), 'meta':json_util.loads(ob.meta)}) for ob in Readings.objects.all().order_by('-id')[:20]]
-            #dic["the last 5 recorded stamps in local DB"] = [('data=' + ob.data + "    meta=" + ob.meta) for ob in Readings.objects.all().order_by('-id')[:5]]
+            #dic["the last 5 recorded stamps in local DB"] = [{'data':json_util.loads(ob.data), 'meta':json_util.loads(ob.meta)} for ob in Reading.objects.all().order_by('-id')[:5]]
+            dic["the last 20 recorded stamps in local DB"] = [str({'data':json_util.loads(ob.data), 'meta':json_util.loads(ob.meta)}) for ob in Reading.objects.all().order_by('-id')[:20]]
+            #dic["the last 5 recorded stamps in local DB"] = [('data=' + ob.data + "    meta=" + ob.meta) for ob in Reading.objects.all().order_by('-id')[:5]]
         jdic= json_util.dumps(dic)
     except:
         err = traceback.format_exc()

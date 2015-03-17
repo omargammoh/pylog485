@@ -51,11 +51,14 @@ def _decide_start(data_period, dt):
     print "_decide_start: %s %s %s, totalsec = %s, shift = %s" %(dt, data_period, starton, totalsec, shift)
     return starton
 
-def _get_mb_client(port):
+def _get_mb_client(rs485_conf):
     #port = "COM3"
-    client = MSC(port=port ,method='rtu', baudrate=9600, stopbits=1
-                ,bytesize=8, parity='N'
-                 ,retries=1000, rtscts=True,framer=ModbusRtuFramer, timeout = 0.05)
+    rs485_conf["framer"]=ModbusRtuFramer
+    client = MSC(**rs485_conf)
+
+#    client = MSC(port=port ,method='rtu', baudrate=9600, stopbits=1
+#                ,bytesize=8, parity='N'
+#                 ,retries=1000, rtscts=True,framer=ModbusRtuFramer, timeout = 0.05)
     return client
 
 def _get_point(mb_client, sensors_conf):
@@ -133,14 +136,14 @@ def _process_data(data, sensors_conf):
 
     return res #{'Tamb-avg' : 5., 'Tamb-min' : 1., 'G-min' : 60.}
 
-def record(sample_period, data_period, port, sensors_conf):
+def record(sample_period, data_period, rs485_conf, sensors_conf):
     _prepare_django()
     import pylog485app.models
 
     def stamp_quality(dic_samples):
         return None #return float(len([v for v in dic_samples.values() if v is not None]))/len(dic_samples)
 
-    mb_client = _get_mb_client(port)
+    mb_client = _get_mb_client(rs485_conf)
 
     now = datetime.utcnow()
     starton = _decide_start(data_period, now)
@@ -204,7 +207,7 @@ def record(sample_period, data_period, port, sensors_conf):
         if processed:
             try:
                 processed['timestamp']=stamp
-                pylog485app.models.Readings(data=json_util.dumps(processed)
+                pylog485app.models.Reading(data=json_util.dumps(processed)
                         ,meta=json_util.dumps({'sent':'false', 'quality':'?'})).save()
                 print "    data saved in db"
 

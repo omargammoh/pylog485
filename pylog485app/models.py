@@ -1,6 +1,6 @@
 from django.db import models
 
-class Readings(models.Model):
+class Reading(models.Model):
     data = models.TextField()
     meta = models.TextField()
 

@@ -11,30 +11,34 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "website.settings")
 
 
-#>>>>OGA
+#>>>> this part tells the sotware the start the record and send processes when the django server starts
 import pylog485app.views.data
 import multiprocessing
 print '-'*20
 print 'initializing processes'
 ac = [m.name for m in multiprocessing.active_children()]
 print 'processes before: %s' %ac
+
 try:
     if not ("record" in ac):
         print 'initoalizing record'
         p_rec = pylog485app.views.data.MP(name='record', target=pylog485app.record.record, request=None, cmd="start")
         p_rec.process_command()
+except:
+    print "!!unable to initialize the record process"
+
+try:
     if not ("send" in ac):
         print 'initializing send'
         p_rec = pylog485app.views.data.MP(name='send', target=pylog485app.send.send, request=None, cmd="start")
         p_rec.process_command()
 except:
-    "!!unable to initialize the processes"
+    print "!!unable to initialize the send process"
+
 ac = [m.name for m in multiprocessing.active_children()]
 print 'processes after: %s' %ac
 print '-'*20
 #<<<<<
-
-
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
