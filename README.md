@@ -257,8 +257,10 @@ echo pcf2127a 0x51 > /sys/class/i2c-adapter/i2c-1/new_device
     * `hwclock -r To read the time from the clock module`
     * `hwclock -s To copy the time from the clock module to the system`
 
-
-
+* android usb tathering:
+    * connect usb of raspberry pi to android
+    * switch tanthering on on android
+    * execute `sudo dhclient usb0` on raspberry pi
 
 
 # How to test this
